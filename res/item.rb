@@ -1,32 +1,47 @@
 class Item < GameObject
 
-  attr_accessor :name, :points, :pos
+  attr_accessor :name, :points, :symbol, :pickable, :decision
 
   def initialize
-    @name = [nil, nil, nil, "c"]
-    @points = [0, 0, 0]
-    @pos = [5, 6] + [7, 8] + [9, 10]
+    super
+    @name =""
+    @points = 0
   end
 
-  def create_item(type)
+  def self.create_item(type)
     result = Item.new
 
     case type
     when :diamond
       result.name = "Diamond"
       result.points = 50
-      self.name[0] = result.name
-      self.points[0] = result.points
+      result.symbol = "* "
+      result.pickable = true
+      result.decision = false
     when :emerald
       result.name = "Emerald"
       result.points = 20
-      self.name[1] = result.name
-      self.points[1] = result.points
+      result.symbol = "+ "
+      result.pickable = true
+      result.decision = false
     when :coin
       result.name = "Coin"
-      result.points = 5  
-      self.name[2] = result.name
-      self.points[2] = result.points
+      result.points = 5 
+      result.symbol = "c " 
+      result.pickable = true
+      result.decision = false
+    when :wall
+      result.name = "Wall"
+      result.points = 0
+      result.pickable = false  
+      result.symbol = "# "
+      result.decision = false
+    when :dec
+      result.name = "Dec"
+      result.points = 0
+      result.pickable = true  
+      result.symbol = ". "
+      result.decision = true
     else
       raise "unknown item type"
     end
@@ -34,4 +49,8 @@ class Item < GameObject
     return result
   end
 
+  def as_symbol
+    self.symbol
+  end
 end  
+

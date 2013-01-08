@@ -1,75 +1,88 @@
 class Enemy < GameObject
 
-  attr_accessor :speed, :pos, :name 
+  attr_accessor :speed, :name, :gamefield, :items
 
 
   def initialize
+    super
     @speed = 0
-    @pos = [1, 3]
     @name = "Enemy"
+    @items = []
   end
 
 
+ def think
   
-
-  def move_enemy(x, y)
-    self.pos[0] += x 
-    self.pos[1] += y
-  end    
-
-  def think_1
-  	a = [1, 0, -1]
-  	x = a.sample
-    y = a.sample 
-  	
-    if self.pos[0] > 1
-      self.move_enemy(x, y)
-    end
-  end   
-
-
-    def think(f)
-     a = ["u", "d", "r", "l"]
-     x=a.sample
-      if x == "u"
-        self.move_u
-      elsif x == "d"
-        self.move_d(f)
-      elsif x == "r"
-        self.move_r(f)
-      elsif x == "l"
-        self.move_l
-      end      
-    end 
-
-    def move_u
-      if self.pos[1] > 1
-        self.move_enemy(0, -1)
-      end
-    end
+  n =  self.gamefield.nearest_decision(self)
+  #puts "=>#{n}<="
+  if self.x < n.first 
+    self.move_r
     
-    def move_d(f)
-      if self.pos[1] < f.size 
-        self.move_enemy(0, 1)
+    unless 
+      puts "think was called !"
+    end
+  #elsif self.x > n.first
+  #  self.move_l
+  #elsif self.y < n.last
+  #  self.move_d
+  #elsif self.y > n.last
+  #  self.move_u
+  else
+  # do nothing      
+  end  
+      
+ end 
+
+  def move_u
+    if self.y > 1
+      self.gamefield.move_object(0, -1, self) do |old|
+        gamefield.check_movement(self, old)
       end
     end
-
-    def move_r(f)
-      if self.pos[0] < f.size
-        self.move_enemy(1, 0)
+    self.drop_items
+  end
+  
+  def move_d
+    if self.y < self.gamefield.size 
+      self.gamefield.move_object(0, 1, self) do |old|
+        gamefield.check_movement(self, old)
       end
     end
+    self.drop_items
+  end
 
-    def move_l
-      if self.pos[0] > 1 
-        self.move_enemy(-1, 0)
+  def move_r
+    if self.x < self.gamefield.size
+      self.gamefield.move_object(1, 0, self) do |old|
+      gamefield.check_movement(self, old)
       end
-    end  
-  
+    end
+    self.drop_items
+  end
 
-  
+  def move_l 
+    if self.x > 1 
+      self.gamefield.move_object(-1, 0, self) do |old|
+        gamefield.check_movement(self, old)
+      end
+    end
+    self.drop_items
+  end
 
-  
+  def as_symbol
+    "E "
+  end  
 
+  def remember_item(item)
+    self.items << item
+  end
+
+  def drop_items
+    self.items.each do |item| 
+      if self.position != item.position 
+        self.gamefield.set_at(item.x, item.y, item)
+      end
+    end 
+  end
 
 end  
